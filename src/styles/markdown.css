@@ -119,3 +119,17 @@
     }
     
 }
+<style>
+  .spoiler {
+    background-color: #4a4a4a; /* 默认的灰色背景 */
+    color: #4a4a4a;           /* 文字颜色和背景色一样，实现“隐藏” */
+    padding: 0 0.2em;        /* 给背景左右一点点内边距，让它比文字稍宽 */
+    border-radius: 4px;      /* 加一点圆角，更好看 */
+    transition: all 0.2s ease-in-out; /* 添加一个平滑的过渡效果 */
+  }
+
+  .spoiler:hover {
+    background-color: transparent; /* 鼠标悬停时，背景变透明 */
+    color: inherit;                /* 鼠标悬停时，文字颜色恢复成和周围一样 */
+  }
+</style>
