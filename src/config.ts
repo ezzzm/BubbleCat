@@ -49,6 +49,11 @@ export const navBarConfig: NavBarConfig = {
 			url: "https://github.com/ezzzm/BubbleCat", // Internal links should not include the base path, as it is automatically added
 			external: true, // Show an external link icon and will open in a new tab
 		},
+		{
+			name: "动漫放映室",
+			url: "/cinema", // 链接到我们准备创建的 cinema.astro 页面
+			external: false, // false 表示这是一个站内链接
+		},
 	],
 };
 
