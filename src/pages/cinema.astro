@@ -1,68 +1,65 @@
 ---
 // 导入你网站的主要布局组件
 import MainGridLayout from "../layouts/MainGridLayout.astro";
+
+// ===============================================
+// == 在这里定义你的播放列表！这是你未来唯一需要修改的地方 ==
+// ===============================================
+const playlist = [
+	{
+		title: "孤独摇滚 - 第1集",
+		url: "https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B01%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4",
+	},
+	{
+		title: "孤独摇滚 - 第2集",
+		url: "https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B02%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4",
+	},
+	{
+		title: "孤独摇滚 - 第3集",
+		url: "https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B03%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4",
+	},
+	// 你可以在这里继续添加更多视频...
+];
 ---
 
 <MainGridLayout title="动漫放映室">
-  <!-- =============================================== -->
-  <!-- == 这里只放纯粹的、可见的 HTML 内容！       == -->
-  <!-- =============================================== -->
-  <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full rounded-[var(--radius-large)]">
-    <h1 class="text-3xl font-bold mb-4">动漫放映室</h1>
-    <p class="mb-6 text-gray-600 dark:text-gray-400">
-      欢迎来到Bdu同人交流会动漫放映室！点击播放器上的“一起看”图标，即可与朋友同步观影。
-    </p>
+  <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full rounded-[var(--radius-large)] space-y-6">
+    
+    <div>
+        <h1 class="text-3xl font-bold mb-2">动漫放映室</h1>
+        <p class="text-gray-600 dark:text-gray-400">
+          欢迎来到Bdu同人交流会动漫放映室！请在下方选择集数观看。
+        </p>
+    </div>
+
+    <!-- 唯一的 Plyr.io 视频播放器 -->
     <div class="plyr__video-embed" id="player">
         <video controls playsinline>
-            <source 
-                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B01%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4" 
-                type="video/mp4" 
-            />
-        </video>
-                <video controls playsinline>
-            <source 
-                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B02%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4" 
-                type="video/mp4" 
-            />
-        </video>
-                <video controls playsinline>
-            <source 
-                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%5BAirota%5D%5BBOCCHI%20THE%20ROCK!%5D%5B03%5D%5BBDRip%201080p%20AVC%20AAC%5D%5BCHS%5D_batch.mp4" 
-                type="video/mp4" 
-            />
+            <source src={playlist[0].url} type="video/mp4" />
         </video>
     </div>
-    <p class="mt-6 text-sm text-gray-500">
-      <strong>如何使用：</strong>
-      <ol class="list-decimal list-inside mt-2 space-y-1">
-        <li>义！务！</li>
-        <li>哥们在这儿跟你说唱！</li>
-      </ol>
+
+    <!-- 播放列表按钮 -->
+    <div id="playlist-controls">
+      <h3 class="text-xl font-semibold mb-3">播放列表</h3>
+      <div class="flex flex-wrap gap-2">
+        {playlist.map((video) => (
+          <button 
+            class="playlist-btn px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md hover:bg-blue-500 hover:text-white transition"
+            data-video-src={video.url}
+          >
+            {video.title}
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <p class="text-sm text-gray-500">
+      <strong>如何一起看：</strong> 点击播放器上的“一起看”图标，创建或加入房间，同步观影。
     </p>
 
-    {/* Giscus 评论区容器 */}
-    {/* 注意：Giscus 脚本被移到下面去了 */}
-    <section id="comments" class="mt-4">
-      <!-- 容器留在这里，但脚本移走 -->
-    </section>
-  </div>
-</MainGridLayout>
-
-
-<!-- ======================================================= -->
-<!-- == 把所有的页面级 <script> 标签都放在这里！       == -->
-<!-- ======================================================= -->
-
-<!-- 初始化 Plyr 的脚本 -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const player = new Plyr('video');
-  });
-</script>
-
-<!-- Giscus 的脚本 -->
-<!-- 我把它放到了一个空的 div 容器里，这是 Giscus 官方推荐的更稳妥的做法 -->
-<div id="giscus-container" class="card-base px-6 md:px-9 py-6 mt-4 rounded-[var(--radius-large)] onload-animation">
+    <!-- Giscus 评论区，放在主卡片的底部 -->
+    <div id="giscus-container" class="border-t border-gray-200 dark:border-gray-700 pt-6">
     <script 
         src="https://giscus.app/client.js"
         data-repo="ezzzm/Bubblecat"
@@ -80,5 +77,35 @@ import MainGridLayout from "../layouts/MainGridLayout.astro";
         crossorigin="anonymous"
         async>
     </script>
+    </div>
 
-</div>
+  </div>
+</MainGridLayout>
+
+<!-- ======================================================= -->
+<!-- ==        只为这个页面加载的脚本区域                 == -->
+<!-- ======================================================= -->
+
+<!-- 初始化 Plyr 和 播放列表逻辑 的脚本 -->
+<script is:inline>
+  document.addEventListener('DOMContentLoaded', () => {
+    const player = new Plyr('video');
+
+    const playlistButtons = document.querySelectorAll('.playlist-btn');
+    playlistButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const newVideoSrc = button.getAttribute('data-video-src');
+        if (newVideoSrc) {
+          player.source = {
+            type: 'video',
+            sources: [{ src: newVideoSrc, type: 'video/mp4' }],
+          };
+          player.play();
+        }
+      });
+    });
+  });
+</script>
+
+<!-- VideoTogether 脚本 -->
+<script is:inline src="https://2gether.video/release/extension.website.user.js"></script>
