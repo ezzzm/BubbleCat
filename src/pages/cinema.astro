@@ -2,29 +2,32 @@
 // 导入你网站的主要布局组件，确保页面风格统一
 import MainGridLayout from "../layouts/MainGridLayout.astro";
 ---
+
 <MainGridLayout title="动漫放映室">
   <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full rounded-[var(--radius-large)]">
     
     <h1 class="text-3xl font-bold mb-4">动漫放映室</h1>
     
     <p class="mb-6 text-gray-600 dark:text-gray-400">
-      欢迎来到 BubbleCat 的动漫放映室！点击下方视频播放器角落的“一起看”按钮，创建或加入房间，与朋友们同步观影吧。
+      欢迎来到 BubbleCat 的私人放映室！点击播放器上的“一起看”图标，即可与朋友同步观影。
     </p>
 
-    <!-- 在这里嵌入一个 Bilibili 视频播放器作为“放映机” -->
-    <!-- 你可以随时更换 src 里的 bvid 来播放不同的视频 -->
-    <div class="aspect-w-16 aspect-h-9">
-        <iframe 
-          width="100%" 
-          src="//player.bilibili.com/player.html?bvid=BV1GJ411x7h7&autoplay=0&danmaku=0" 
-          scrolling="no" 
-          border="0" 
-          frameborder="no" 
-          framespacing="0" 
-          allowfullscreen="true"
-          class="w-full h-full"
-        >
-        </iframe>
+    <!-- Plyr.io 视频播放器 -->
+    <div class="plyr__video-embed" id="player">
+        <video controls playsinline>
+            <!-- 
+                =======================================================
+                == 关键！在这里粘贴你完整的视频链接！              ==
+                =======================================================
+                你需要把你上传的视频文件名，加在你提供的URL后面。
+                例如：
+                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/【可爱史莱姆露露第二季】1-11话 - 11.11(Av115202246904432,P11).mp4"
+            -->
+            <source 
+                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/【可爱史莱姆露露第二季】1-11话 - 11.11(Av115202246904432,P11).mp4" 
+                type="video/mp4" 
+            />
+        </video>
     </div>
 
     <p class="mt-6 text-sm text-gray-500">
@@ -38,19 +41,13 @@ import MainGridLayout from "../layouts/MainGridLayout.astro";
     </p>
 
   </div>
-</MainGridLayout>
 
-<!-- 这段 style 是为了让视频播放器保持16:9的比例，让它更好看 -->
-<style>
-  .aspect-w-16 {
-    position: relative;
-    padding-bottom: 56.25%; /* 9 / 16 = 0.5625 */
-  }
-  .aspect-w-16 > iframe {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-  }
-</style>    
+  <!-- 初始化 Plyr 的脚本 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 初始化页面上第一个 <video> 元素的 Plyr 播放器
+      const player = new Plyr('video');
+    });
+  </script>
+
+</MainGridLayout>
