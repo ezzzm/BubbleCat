@@ -146,6 +146,7 @@ const bannerOffset =
 		<slot name="head"></slot>
 
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
+		<link rel="stylesheet" href="/styles/plyr.css" />
 
 	</head>
 	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
@@ -159,6 +160,7 @@ const bannerOffset =
 
 		<script src="https://fastly.jsdelivr.net/gh/VideoTogether/VideoTogether@latest/release/extension.website.user.js"></script>
 		
+		<script is:inline src="/js/plyr.polyfilled.js"></script>
 	</body>
 </html>
 

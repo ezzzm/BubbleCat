@@ -1,35 +1,25 @@
 ---
-// 导入你网站的主要布局组件，确保页面风格统一
+// 导入你网站的主要布局组件
 import MainGridLayout from "../layouts/MainGridLayout.astro";
 ---
 
 <MainGridLayout title="动漫放映室">
+  <!-- =============================================== -->
+  <!-- == 这里只放纯粹的、可见的 HTML 内容！       == -->
+  <!-- =============================================== -->
   <div class="card-base z-10 px-6 md:px-9 pt-6 pb-4 relative w-full rounded-[var(--radius-large)]">
-    
     <h1 class="text-3xl font-bold mb-4">动漫放映室</h1>
-    
     <p class="mb-6 text-gray-600 dark:text-gray-400">
       欢迎来到Bdu同人交流会动漫放映室！点击播放器上的“一起看”图标，即可与朋友同步观影。
     </p>
-
-    <!-- Plyr.io 视频播放器 -->
     <div class="plyr__video-embed" id="player">
         <video controls playsinline>
-            <!-- 
-                =======================================================
-                == 关键！在这里粘贴你完整的视频链接！              ==
-                =======================================================
-                你需要把你上传的视频文件名，加在你提供的URL后面。
-                例如：
-                src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/【可爱史莱姆露露第二季】1-11话 - 11.11(Av115202246904432,P11).mp4"
-            -->
             <source 
                 src="https://pub-954ecf537a9d4e45b78d5f14f7bf7a99.r2.dev/%E3%80%90%E5%8F%AF%E7%88%B1%E5%8F%B2%E8%8E%B1%E5%A7%86%E5%99%97%E5%B0%BC%E9%9C%B2%E7%AC%AC%E4%BA%8C%E5%AD%A3%E3%80%911-11%E8%AF%9D%20-%2011.11(Av115202246904432%2CP11).mp4" 
                 type="video/mp4" 
             />
         </video>
     </div>
-
     <p class="mt-6 text-sm text-gray-500">
       <strong>如何使用：</strong>
       <ol class="list-decimal list-inside mt-2 space-y-1">
@@ -38,14 +28,45 @@ import MainGridLayout from "../layouts/MainGridLayout.astro";
       </ol>
     </p>
 
+    {/* Giscus 评论区容器 */}
+    {/* 注意：Giscus 脚本被移到下面去了 */}
+    <section id="comments" class="mt-4">
+      <!-- 容器留在这里，但脚本移走 -->
+    </section>
   </div>
-
-  <!-- 初始化 Plyr 的脚本 -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      // 初始化页面上第一个 <video> 元素的 Plyr 播放器
-      const player = new Plyr('video');
-    });
-  </script>
-
 </MainGridLayout>
+
+
+<!-- ======================================================= -->
+<!-- == 把所有的页面级 <script> 标签都放在这里！       == -->
+<!-- ======================================================= -->
+
+<!-- 初始化 Plyr 的脚本 -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const player = new Plyr('video');
+  });
+</script>
+
+<!-- Giscus 的脚本 -->
+<!-- 我把它放到了一个空的 div 容器里，这是 Giscus 官方推荐的更稳妥的做法 -->
+<div id="giscus-container" class="card-base px-6 md:px-9 py-6 mt-4 rounded-[var(--radius-large)] onload-animation">
+    <script 
+        src="https://giscus.app/client.js"
+        data-repo="ezzzm/Bubblecat"
+        data-repo-id="R_kgDOPnrAKA"
+        data-category="Announcements"
+        data-category-id="DIC_kwDOPnrAKM4Cu1Yw"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="top"
+        data-theme="noborder_light"
+        data-lang="zh-CN"
+        data-loading="lazy"
+        crossorigin="anonymous"
+        async>
+    </script>
+
+</div>
