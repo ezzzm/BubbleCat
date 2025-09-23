@@ -97,50 +97,28 @@ const playlist = [
 <!-- ======================================================= -->
 <!-- ==        只为这个页面加载的脚本区域                 == -->
 <!-- ======================================================= -->
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
-<!-- 初始化 Plyr 和 播放列表逻辑 的脚本 -->
-<!-- 1. 直接、静态地加载 VideoTogether 脚本，保证加载时机 -->
 <script is:inline src="https://fastly.jsdelivr.net/gh/VideoTogether/VideoTogether@latest/release/extension.website.user.js"></script>
 
-<!-- 2. 初始化 Plyr 和 播放列表逻辑 -->
-<script is:inline>
-  // 使用 astro:page-load 事件确保在客户端导航时也能正确初始化
-  document.addEventListener('astro:page-load', () => {
-    // 防止因快速导航导致重复初始化
-    if (window.plyrInstance) return;
-    
-    const player = new Plyr('video');
-    window.plyrInstance = player; // 将播放器实例挂载到 window，便于管理和销毁
+<script is:inline src="https://cdn.plyr.io/3.7.8/plyr.js" defer></script>
 
-    const playlistButtons = document.querySelectorAll('.playlist-btn');
-    playlistButtons.forEach(button => {
-      button.addEventListener('click', () => {
-        const newVideoSrc = button.getAttribute('data-video-src');
-        if (newVideoSrc) {
-          player.source = {
-            type: 'video',
-            sources: [{ src: newVideoSrc, type: 'video/mp4' }],
-          };
-          player.play();
-        }
-      });
+<script is:inline defer>
+
+  const player = new Plyr('video');
+
+  const playlistButtons = document.querySelectorAll('.playlist-btn');
+
+  playlistButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      const newVideoSrc = button.getAttribute('data-video-src');
+      if (newVideoSrc) {
+        player.source = {
+          type: 'video',
+          sources: [{ src: newVideoSrc, type: 'video/mp4' }],
+        };
+        player.play();
+      }
     });
-  });
-</script>
-
-<!-- 3. 【关键】添加清理逻辑，在离开页面时卸载所有脚本功能 -->
-<script is:inline>
-  document.addEventListener('astro:before-swap', () => {
-    // 销毁 Plyr 实例
-    if (window.plyrInstance) {
-      window.plyrInstance.destroy();
-      window.plyrInstance = null;
-    }
-
-    // 调用 VideoTogether 官方卸载方法
-    if (window.videoTogether && typeof window.videoTogether.dispose === 'function') {
-      console.log('Disposing VideoTogether using official method...');
-      window.videoTogether.dispose();
-    }
   });
 </script>
