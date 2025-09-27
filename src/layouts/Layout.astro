@@ -77,7 +77,7 @@ const bannerOffset =
 	  data-overlayscrollbars-initialize
 >
 	<head>
-		
+
 		<title>{pageTitle}</title>
 
 		<meta charset="UTF-8" />
@@ -147,26 +147,102 @@ const bannerOffset =
 
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 		<link rel="stylesheet" href="/styles/plyr.css" />
+		
 
 
 	</head>
 	
 	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
-	>
-		<ConfigCarrier></ConfigCarrier>
+		  >
+		  <ConfigCarrier></ConfigCarrier>
+		  
+		  <main id="swup">
+			  <slot />
+			</main>
+			
+			<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
+			<div id="page-height-extend" class="hidden h-[300vh]"></div>
+			
+			<script is:inline src="/js/plyr.polyfilled.js"></script>
+			<script is:inline src="https://fastly.jsdelivr.net/gh/VideoTogether/VideoTogether@latest/release/extension.website.user.js"></script>
+			<script is:inline src="/js/plyr-init.js"></script>
+			<script is:inline>
+			(() => {
+				// 确保整个初始化过程只在客户端运行一次
+				if (typeof window === 'undefined' || window.live2dWidgetOrchestrator) {
+					return;
+				}
 
-		<main id="swup">
-			<slot />
-		</main>
+				// --- 配置区 ---
+				// 这是 autoload.js 会读取的全局配置对象
+				window.live2d_settings = {
+					waifuPath: '/live2d-assets/waifu-tips.json', // 强烈建议本地化
+					cdnPath: 'https://fastly.jsdelivr.net/gh/fghrsh/live2d_api/',
+					cubism2Path: '/js/live2d.min.js', // 强烈建议本地化
+					tools: ['hitokoto', 'switch-model', 'photo', 'info', 'quit'],
+				};
 
-		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
-		<div id="page-height-extend" class="hidden h-[300vh]"></div>
-		
-		<script is:inline src="/js/plyr.polyfilled.js"></script>
-		<script is:inline src="https://fastly.jsdelivr.net/gh/VideoTogether/VideoTogether@latest/release/extension.website.user.js"></script>
-		<script is:inline src="/js/plyr-init.js"></script>
-		<Live2DWidget />
+				// [新函数] 重新运作的核心函数
+			function reinitLive2D() {
+				if (typeof window.initWidget === 'function') {
+					const existingWaifu = document.getElementById('waifu');
+					if (existingWaifu) {
+						existingWaifu.remove();
+					}
+
+					// =========================================================================
+					// [最终的关键修复] 使用 setTimeout 延迟执行初始化
+					// =========================================================================
+					setTimeout(() => {
+						window.initWidget(window.live2d_settings);
+					}, 1000); // 延迟 100 毫秒，等待 DOM 稳定
+					// =========================================================================
+				}
+			}
+
+				// 主流程函数
+				function main() {
+					if (window.innerWidth < 768) return;
+
+					// 1. 加载您指定的 autoload.js
+					const script = document.createElement('script');
+					script.src = 'https://fastly.jsdelivr.net/npm/live2d-widgets@1.0.0-rc.7/dist/autoload.js';
+					
+					script.onload = () => {
+						// 首次加载成功后，看板娘会自动显示。
+						// 我们在这里设置 Swup 事件监听器，以便在页面切换后“重新运作”。
+						document.addEventListener('swup:page:view', reinitLive2D);
+					};
+					
+					document.body.appendChild(script);
+
+					// 2. 注入 CSS 修复，解决按钮点击和层级问题
+					const styleFix = document.createElement('style');
+					styleFix.innerHTML = `
+						#waifu {
+							z-index: 99999 !important;
+							pointer-events: none !important;
+						}
+						#waifu-toggle, #waifu-tool *, #live2d, .waifu-tips {
+							pointer-events: auto !important;
+						}
+					`;
+					document.head.appendChild(styleFix);
+				}
+				
+				// 设置一个全局对象，防止重复执行
+				window.live2dWidgetOrchestrator = {
+					reinit: reinitLive2D,
+					init: main
+				};
+
+				// 执行主流程
+				main();
+
+			})();
+			</script>
+
 	</body>
 </html>
 
@@ -553,17 +629,31 @@ function createPhotoSwipe() {
 
 	lightbox.init()
 }
+document.addEventListener('DOMContentLoaded', () => {
+    // 获取页面上所有的链接
+    const links = document.querySelectorAll('a');
 
+    links.forEach(link => {
+        // 为每个链接添加点击事件监听
+        link.addEventListener('click', function(event) {
+            const href = this.getAttribute('href');
+
+            // 检查链接是否是有效的页面内跳转链接
+            // (不是空链接、不是锚点链接、不是在新标签页打开、不是外部链接)
+            if (href && href[0] !== '#' && this.target !== '_blank' && new URL(href, window.location.origin).origin === window.location.origin) {
+                
+                // 阻止默认的跳转行为（包括 Swup 的拦截）
+                event.preventDefault();
+                event.stopPropagation(); // 阻止事件冒泡
+
+                // 执行一次传统的、完整的页面跳转
+                window.location.href = href;
+            }
+        }, true); // 使用事件捕获阶段，确保我们的逻辑比 Swup 更早执行
+    });
+});
 const setup = () => {
-    // =========================================================================
-    // [修改 2/2] 在 setup 函数的第一行，强制修正 Swup 的行为
-    // =========================================================================
-    if (window.swup) {
-        window.swup.options.containers = ['#swup'];
-    }
-    // =========================================================================
-
-	// --- 下面是主题原有的 PhotoSwipe 逻辑，保持不变 ---
+	
 	if (!lightbox) {
 		createPhotoSwipe()
 	}

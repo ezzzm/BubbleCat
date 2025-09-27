@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Live2D Widget</title>
+    <!-- [关键] 我们需要手动加载 waifu.css 来为工具栏提供样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/waifu.css" />
+    <style>
+        /* 确保 iframe 内部干净透明 */
+        body, html {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <!--
+        这个 div 是 L2Dwidget.js 用来放置所有 UI 元素的容器
+        虽然它会自动创建，但预先放置可以避免一些问题
+    -->
+    <div class="waifu">
+        <div class="waifu-tips"></div>
+        <canvas id="live2d" class="live2d"></canvas>
+        <div class="waifu-tool">
+            <span class="fui-home"></span>
+            <span class="fui-chat"></span>
+            <span class="fui-eye"></span>
+            <span class="fui-user"></span>
+            <span class="fui-photo"></span>
+            <span class="fui-info-circle"></span>
+            <span class="fui-cross"></span>
+        </div>
+    </div>
+    
+    <!-- 加载 L2Dwidget.js 核心库 -->
+    <script src="https://cdn.jsdelivr.net/npm/live2d-widget@3.1.4/lib/L2Dwidget.min.js"></script>
+
+    <!-- [关键] 使用 L2Dwidget.js 正确的配置来初始化 -->
+    <script>
+        // 等待页面加载完毕
+        window.onload = function() {
+            L2Dwidget.init({
+                // 您可以在这里修改和配置
+                "model": {
+                    // 使用一个公共的、免费的模型 API
+                    "jsonPath": "https://unpkg.com/live2d-widget-model-shizuku@1.0.5/assets/shizuku.model.json",
+                    "scale": 1
+                },
+                "display": {
+                    "position": "left",
+                    "width": 150,
+                    "height": 300,
+                    "hOffset": 10,
+                    "vOffset": -20
+                },
+                "mobile": {
+                    "show": true,
+                    "scale": 0.5
+                },
+                "dialog": {
+                    "enable": true, // 启用对话框
+                    "hitokoto": true // 启用一言
+                }
+            });
+        };
+    </script>
+
+</body>
+</html>
