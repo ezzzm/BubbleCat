@@ -4,6 +4,7 @@ import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
 import ConfigCarrier from "@components/ConfigCarrier.astro";
+import Live2DWidget from "@components/Live2DWidget.astro";
 import { profileConfig, siteConfig } from "@/config";
 import {
 	AUTO_MODE,
@@ -71,13 +72,12 @@ const bannerOffsetByPosition = {
 const bannerOffset =
 	bannerOffsetByPosition[siteConfig.banner.position || "center"];
 ---
-
 <!DOCTYPE html>
 <html lang={siteLang} class="bg-[var(--page-bg)] transition text-[14px] md:text-[16px]"
 	  data-overlayscrollbars-initialize
 >
 	<head>
-
+		
 		<title>{pageTitle}</title>
 
 		<meta charset="UTF-8" />
@@ -148,21 +148,25 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={profileConfig.name} href={`${Astro.site}rss.xml`}/>
 		<link rel="stylesheet" href="/styles/plyr.css" />
 
+
 	</head>
+	
 	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
-		<slot />
+
+		<main id="swup">
+			<slot />
+		</main>
 
 		<!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
 		<div id="page-height-extend" class="hidden h-[300vh]"></div>
 		
 		<script is:inline src="/js/plyr.polyfilled.js"></script>
 		<script is:inline src="https://fastly.jsdelivr.net/gh/VideoTogether/VideoTogether@latest/release/extension.website.user.js"></script>
-		<script is:inline src="/js/live2d-config.js"></script>
 		<script is:inline src="/js/plyr-init.js"></script>
-
+		<Live2DWidget />
 	</body>
 </html>
 
@@ -218,6 +222,7 @@ import {
 	MAIN_PANEL_OVERLAPS_BANNER_HEIGHT
 } from "../constants/constants";
 import { siteConfig } from '../config';
+
 
 /* Preload fonts */
 // (async function() {
@@ -550,6 +555,15 @@ function createPhotoSwipe() {
 }
 
 const setup = () => {
+    // =========================================================================
+    // [修改 2/2] 在 setup 函数的第一行，强制修正 Swup 的行为
+    // =========================================================================
+    if (window.swup) {
+        window.swup.options.containers = ['#swup'];
+    }
+    // =========================================================================
+
+	// --- 下面是主题原有的 PhotoSwipe 逻辑，保持不变 ---
 	if (!lightbox) {
 		createPhotoSwipe()
 	}

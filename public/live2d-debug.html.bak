@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live2D 调试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        .debug-info {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 20px;
+            white-space: pre;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Live2D 调试页面</h1>
+        <p>此页面用于调试 Live2D 模型加载问题。</p>
+        
+        <button id="check-paths">检查资源路径</button>
+        <button id="load-model">手动加载模型</button>
+        <button id="check-errors">检查控制台错误</button>
+        
+        <div class="debug-info" id="debug-output">
+            [等待操作...]
+        </div>
+    </div>
+
+    <!-- 加载Live2D资源 -->
+    <script>
+        // 配置变量
+        window.debugInfo = [];
+        const debugOutput = document.getElementById('debug-output');
+        
+        // 重写console.log和console.error以捕获信息
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function() {
+            window.debugInfo.push('[LOG] ' + Array.from(arguments).join(' '));
+            updateDebugOutput();
+            originalLog.apply(console, arguments);
+        };
+        
+        console.error = function() {
+            window.debugInfo.push('[ERROR] ' + Array.from(arguments).join(' '));
+            updateDebugOutput();
+            originalError.apply(console, arguments);
+        };
+        
+        function updateDebugOutput() {
+            debugOutput.textContent = window.debugInfo.join('\n');
+        }
+        
+        function loadExternalResource(url, type) {
+            return new Promise((resolve, reject) => {
+                let tag;
+
+                if (type === "css") {
+                    tag = document.createElement("link");
+                    tag.rel = "stylesheet";
+                    tag.href = url;
+                } else if (type === "js") {
+                    tag = document.createElement("script");
+                    tag.src = url;
+                    tag.async = true;
+                }
+                if (tag) {
+                    tag.onload = () => {
+                        console.log(`成功加载: ${url}`);
+                        resolve(url);
+                    };
+                    tag.onerror = () => {
+                        console.error(`加载失败: ${url}`);
+                        reject(url);
+                    };
+                    document.head.appendChild(tag);
+                }
+            });
+        }
+        
+        // 按钮事件处理
+        document.getElementById('check-paths').addEventListener('click', function() {
+            console.log('--- 检查资源路径 ---');
+            checkResourceExists('/css/waifu.css');
+            checkResourceExists('/js/waifu-tips.js');
+            checkResourceExists('/js/live2d.min.js');
+            checkResourceExists('/js/waifu-tips.json');
+            checkResourceExists('/live2d-models/model_list.json');
+        });
+        
+        document.getElementById('load-model').addEventListener('click', function() {
+            console.log('--- 尝试手动加载模型 ---');
+            loadExternalResource('/css/waifu.css', 'css')
+                .then(() => loadExternalResource('/js/live2d.min.js', 'js'))
+                .then(() => loadExternalResource('/js/waifu-tips.js', 'js'))
+                .then(() => {
+                    console.log('资源加载完成，尝试初始化...');
+                    
+                    try {
+                        if (typeof initWidget === 'function') {
+                            initWidget({
+                                waifuPath: "/js/waifu-tips.json",
+                                cdnPath: "/live2d-models/",
+                                tools: ["hitokoto", "switch-model", "photo", "info", "quit"]
+                            });
+                            console.log('initWidget函数已调用');
+                        } else {
+                            console.error('initWidget函数不存在！');
+                        }
+                    } catch (e) {
+                        console.error('初始化出错:', e);
+                    }
+                })
+                .catch(error => {
+                    console.error('加载过程中出错:', error);
+                });
+        });
+        
+        document.getElementById('check-errors').addEventListener('click', function() {
+            console.log('--- 当前已捕获的错误 ---');
+            const errors = window.debugInfo.filter(item => item.includes('[ERROR]'));
+            if (errors.length === 0) {
+                console.log('没有发现错误！');
+            } else {
+                errors.forEach(error => console.log(error));
+            }
+        });
+        
+        function checkResourceExists(url) {
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`资源存在: ${url}`);
+                    } else {
+                        console.error(`资源不存在或无法访问: ${url} (${response.status})`);
+                    }
+                })
+                .catch(error => {
+                    console.error(`检查资源出错: ${url}`, error);
+                });
+        }
+        
+        // 页面加载时
+        window.addEventListener('DOMContentLoaded', () => {
+            console.log('调试页面已加载');
+            console.log('请点击上方按钮进行调试操作');
+        });
+    </script>
+
+    <!-- 页面加载完成后，加载配置脚本 -->
+    <script>
+        // 10秒后自动添加Live2D配置
+        setTimeout(() => {
+            loadExternalResource('/js/live2d-config.js', 'js')
+                .then(() => {
+                    console.log('Live2D配置脚本已加载');
+                })
+                .catch(error => {
+                    console.error('加载Live2D配置脚本失败:', error);
+                });
+        }, 3000);
+    </script>
+</body>
+</html>
